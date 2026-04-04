@@ -68,7 +68,8 @@ export default function LoginScreen({ navigation }) {
       );
       if (!user) throw new Error('Invalid email or password.');
       await new Promise((r) => setTimeout(r, 800));
-      navigation.replace('Dashboard', { user });
+      const dest = user.role === 'resident' ? 'ResidentHome' : 'WorkerHome';
+      navigation.replace(dest, { user });
     } catch (err) {
       setLoginError(err.message);
       setIsLoading(false);

@@ -82,6 +82,8 @@ export default function ResidentDashboard({ route, navigation }) {
   // Prepend new request submitted from BookingModal
   function handleNewRequest(data) {
     setRequests(prev => [data, ...prev]);
+    setModalOpen(false);
+    navigation.navigate('FindWorkers', { request: data });
   }
 
   // Derived stats for the 3 stat cards
