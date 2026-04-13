@@ -1,4 +1,7 @@
 // screens/LoginScreen.js
+// UPDATED: replaced STATIC_USERS with real Django JWT login via authApi.
+// On success, saves session to AsyncStorage and navigates to role-specific stack.
+
 import React, { useState, useRef, useEffect } from 'react';
 import {
   View, Text, TouchableOpacity,
@@ -10,15 +13,10 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import FormInput from '../components/FormInput';
-import styles from '../styles/LoginScreen.styles';
-import Colors from '../styles/colors';
-
-// Static accounts — mirrors web app localAuth
-const STATIC_USERS = [
-  { email: 'worker@skilllink.com',   password: 'worker123',   full_name: 'Juan Dela Cruz', role: 'worker'   },
-  { email: 'resident@skilllink.com', password: 'resident123', full_name: 'Maria Santos',   role: 'resident' },
-];
+import FormInput        from '../components/FormInput';
+import styles           from '../styles/LoginScreen.styles';
+import Colors           from '../styles/colors';
+import { authApi }      from '../services/api';  // backend
 
 export default function LoginScreen({ navigation }) {
   const insets = useSafeAreaInsets();
@@ -43,7 +41,6 @@ export default function LoginScreen({ navigation }) {
     ]).start();
   }, []);
 
-  // Handlers — mirror web Login.jsx logic
   function handleInput(field, value) {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: '' }));
@@ -59,46 +56,62 @@ export default function LoginScreen({ navigation }) {
 
   async function handleSubmit() {
     const validationErrors = validate();
-    if (Object.keys(validationErrors).length > 0) { setErrors(validationErrors); return; }
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+    
     setErrors({});
-    setIsLoading(true);
+    setIsLoading(true); // Starts "Authenticating..."
+
     try {
-      const user = STATIC_USERS.find(
-        (u) => u.email === formData.email.trim() && u.password === formData.password
+      // 1. Call the updated login logic
+      const user = await authApi.login(
+        formData.email.trim().toLowerCase(),
+        formData.password,
       );
-      if (!user) throw new Error('Invalid email or password.');
-      await new Promise((r) => setTimeout(r, 800));
-      const dest = user.role === 'resident' ? 'ResidentHome' : 'WorkerHome';
-      navigation.replace(dest, { user });
+
+      // 2. Fetch full name
+      try {
+        const me = await authApi.getMe();
+        user.full_name = me.full_name ?? me.email ?? user.email;
+      } catch (_) {}
+
+      // 3. Route based on the lowercase role
+      if (user.role === 'worker') {
+        navigation.replace('WorkerHome', { user });
+      } else if (user.role === 'resident') {
+        navigation.replace('ResidentHome', { user });
+      } else {
+        setLoginError('Admin accounts are managed via the web portal only.');
+      }
     } catch (err) {
-      setLoginError(err.message);
-      setIsLoading(false);
+      setLoginError(err.message || 'Login failed. Please try again.');
+    } finally {
+      // PREVENTS THE HANG: Reset loading state regardless of outcome
+      setIsLoading(false); 
     }
   }
 
   return (
     <View style={styles.root}>
       <StatusBar style="light" />
-
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <ScrollView
           contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 32 }]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-
-          {/* ── Hero banner ── */}
+          {/* Hero banner */}
           <Animated.View style={[styles.heroBanner, { opacity: heroAnim }]}>
             <LinearGradient
               colors={[Colors.skillDark, '#054d38', '#043d2d']}
-              style={{ ...{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 } }}
+              style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
               start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
             />
             <View style={[styles.heroCircle, styles.heroCircle1]} />
             <View style={[styles.heroCircle, styles.heroCircle2]} />
-
             <View style={{ height: insets.top + 10 }} />
-
             <View style={styles.heroBranding}>
               <View style={styles.logoWrap}>
                 <Image source={require('../assets/logo.png')} style={{ width: 50, height: 50 }} />
@@ -108,19 +121,17 @@ export default function LoginScreen({ navigation }) {
             </View>
           </Animated.View>
 
-          {/* ── Form card ── */}
+          {/* Form card */}
           <Animated.View style={[styles.formCard, { opacity: cardAnim, transform: [{ translateY: cardSlide }] }]}>
             <LinearGradient
               colors={[Colors.skillPrimary, Colors.emerald600]}
               start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
               style={styles.cardTopLine}
             />
-
             <View style={styles.formHeader}>
               <Text style={styles.welcomeTitle}>Welcome Back</Text>
               <Text style={styles.welcomeSub}>Sign in to your account</Text>
             </View>
-
             <View style={styles.divider} />
 
             <Text style={styles.fieldLabel}>Email Address</Text>
@@ -152,8 +163,17 @@ export default function LoginScreen({ navigation }) {
               </View>
             ) : null}
 
-            <TouchableOpacity onPress={handleSubmit} disabled={isLoading} activeOpacity={0.85} style={[styles.submitWrap, isLoading && { opacity: 0.75 }]}>
-              <LinearGradient colors={[Colors.skillPrimary, Colors.emerald700]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.submitBtn}>
+            <TouchableOpacity
+              onPress={handleSubmit}
+              disabled={isLoading}
+              activeOpacity={0.85}
+              style={[styles.submitWrap, isLoading && { opacity: 0.75 }]}
+            >
+              <LinearGradient
+                colors={[Colors.skillPrimary, Colors.emerald700]}
+                start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                style={styles.submitBtn}
+              >
                 {isLoading ? (
                   <View style={styles.btnRow}>
                     <ActivityIndicator color="#fff" size="small" />
@@ -170,7 +190,6 @@ export default function LoginScreen({ navigation }) {
           </Animated.View>
 
           <Text style={styles.footer}>Barangay Digital Services · Cagayan de Oro</Text>
-
         </ScrollView>
       </KeyboardAvoidingView>
     </View>

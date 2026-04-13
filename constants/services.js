@@ -77,10 +77,10 @@ export const SERVICE_CATEGORIES = [
 // Budget tiles — Step 2 of booking modal
 // Uses daily-rate framing to match the web app and SRS
 export const BUDGET_OPTIONS = [
-  { id: 'b1', label: 'Under ₱300/day',    value: 'under_300'  },
-  { id: 'b2', label: '₱300 – ₱400/day',  value: '300_400'    },
-  { id: 'b3', label: '₱400 – ₱500/day',  value: '400_500'    },
-  { id: 'b4', label: '₱500+/day',         value: '500_plus'   },
+  { id: 'b1', label: 'Under ₱500/day',    value: 'under_500'  },
+  { id: 'b2', label: '₱500 – ₱550/day',  value: '500_550'    },
+  { id: 'b3', label: '₱550 – ₱600/day',  value: '550_600'    },
+  { id: 'b4', label: '₱600+/day',         value: '600_plus'   },
   { id: 'b5', label: 'Open / Negotiable', value: 'negotiable' },
 ];
 
