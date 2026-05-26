@@ -116,7 +116,7 @@ Scan the QR code in the Expo Go app on your device to launch the application.
 ## Deployment Link
 
 **Expo Go Demo:** Scan the QR code below or open the Expo link:
-`exp://expo.dev/accounts/abragan.quenie/projects/Skill-Link-Cdo-Mobile)`
+`exp://expo.dev/abragan.quenie/projects/Skill-Link-Cdo-Mobile)`
 
 **APK (Android):****[Download the Android APK](https://drive.google.com/drive/folders/1yP6lqjRRx24FHsiGGCCfzH02PZA37Iul?usp=drive_link)**
 
