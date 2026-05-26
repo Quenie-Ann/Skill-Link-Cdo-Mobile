@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Base URL for Physical device, change to PC's local IP address
 // export const BASE_URL = 'http://192.168.0.103:8081/api';
-export const BASE_URL = 'http://10.0.2.2:8000/api';
+export const BASE_URL = 'http://10.0.2.2:8000/api/';
 const SESSION_KEY     = 'skilllink_session';
 
 async function request(method, path, body = null) {
