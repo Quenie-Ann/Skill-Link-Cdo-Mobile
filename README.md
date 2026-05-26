@@ -116,9 +116,9 @@ Scan the QR code in the Expo Go app on your device to launch the application.
 ## Deployment Link
 
 **Expo Go Demo:** Scan the QR code below or open the Expo link:
-`exp://exp.host/@your-org/skill-link-cdo-mobile`
+`exp://expo.dev/accounts/abragan.quenie/projects/Skill-Link-Cdo-Mobile)`
 
-**APK (Android):** _(not yet configured for APK)_
+**APK (Android):****[Download the Android APK]((https://drive.google.com/drive/folders/1yP6lqjRRx24FHsiGGCCfzH02PZA37Iul?usp=drive_link))**
 
 ---
 
@@ -126,8 +126,8 @@ Scan the QR code in the Expo Go app on your device to launch the application.
 
 | Role           | Email                    | Password      |
 | -------------- | ------------------------ | ------------- |
-| Skilled Worker | `worker@skilllink.com`   | `worker123`   |
-| Resident       | `resident@skilllink.com` | `resident123` |
+| Skilled Worker | worker.bernard.lim.electrician@skilllinkcdo.com | SkillLink2026! | 
+| Resident       | resident.maria.santos.1@skilllinkcdo.com | SkillLink2026! |
 
 ---
 
@@ -153,4 +153,3 @@ Scan the QR code in the Expo Go app on your device to launch the application.
 
 ## Screenshots
 
-> _(Add screenshots of the Resident Job Request flow, Worker Dashboard, and Offer Accept/Decline screen here.)_
